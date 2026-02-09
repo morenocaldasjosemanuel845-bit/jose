@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simulacro (60 preguntas) - Diseño Mecánico</title>
+  <title>Simulacro (60) - Alternativas similares</title>
   <style>
     body { font-family: system-ui, Arial, sans-serif; line-height: 1.35; margin: 20px; }
     h1 { margin-bottom: 6px; }
@@ -21,14 +21,16 @@
     .corr-item { border-top: 1px dashed #ddd; padding-top: 10px; margin-top: 10px; }
     .pill { display:inline-block; padding: 2px 10px; border-radius: 999px; border: 1px solid #ddd; font-size: 12px; margin-left: 6px; }
     .topnote { background: #f7f7f7; border: 1px solid #e6e6e6; padding: 10px 12px; border-radius: 10px; }
+    .tiny { font-size: 12px; color: #666; margin-top: 4px; }
   </style>
 </head>
 <body>
   <h1>Simulacro Teórico (60 preguntas)</h1>
-  <p class="sub">Selecciona una alternativa por pregunta. Al final: puntaje y correcciones.</p>
+  <p class="sub">Alternativas intencionalmente similares. Al final: puntaje + correcciones.</p>
 
   <div class="topnote">
-    <strong>Consejo:</strong> responde primero todo y luego recién calcula. Si dejas una pregunta en blanco, contará como incorrecta.
+    <strong>Regla:</strong> 1 alternativa por pregunta. Si dejas en blanco, se considera incorrecta.
+    <div class="tiny">Basado en el REPASO (cap. 1–8): diseño, materiales, esfuerzos, deflexión, falla estática, fatiga, ejes, tornillos.</div>
   </div>
 
   <form id="quiz"></form>
@@ -41,428 +43,553 @@
   <div id="result" aria-live="polite"></div>
 
 <script>
-  // 60 preguntas basadas en tu repaso (1–60).
-  // Cada pregunta tiene 4 alternativas (A-D) y una explicación breve para la corrección.
+  // NOTA: correct (a) varía, NO es siempre A.
   const questions = [
-    { q: "1) ¿Qué es el diseño en ingeniería mecánica?",
-      opts: ["Proceso para crear sistemas o componentes que cumplan una función segura y eficiente.",
-             "Proceso de fabricación en serie sin planificación.",
-             "Cálculo exclusivo de costos sin considerar seguridad.",
-             "Selección de colores y estética del producto."],
-      a: 0, exp: "El diseño se define como un proceso para crear sistemas/componentes que cumplan su función con seguridad y eficiencia." },
+    // 1–10 Diseño / términos
+    { q:"1) En diseño mecánico, ¿qué enunciado describe mejor el 'diseño'?",
+      opts:[
+        "Solo la elaboración de planos y tolerancias finales.",
+        "Proceso para crear sistemas/componentes que cumplan función con seguridad y eficiencia.",
+        "Proceso de fabricación y control de calidad posterior.",
+        "Cálculo de costos para seleccionar el material más barato."
+      ],
+      a:1, exp:"En el repaso, el diseño se entiende como un proceso para crear soluciones que cumplan función, seguridad y eficiencia." },
 
-    { q: "2) ¿Qué es una necesidad en diseño?",
-      opts: ["Problema o requerimiento que motiva el diseño.",
-             "Lista final de planos y tolerancias.",
-             "Una restricción de material.",
-             "Una norma técnica obligatoria."],
-      a: 0, exp: "La necesidad es el punto de partida: el problema/requerimiento que origina el diseño." },
+    { q:"2) La 'necesidad' en diseño se refiere a:",
+      opts:[
+        "El problema o requerimiento que origina el diseño.",
+        "El conjunto de restricciones de fabricación.",
+        "La lista de ensayos para validación.",
+        "La norma que regula el producto."
+      ],
+      a:0, exp:"Necesidad = problema/requerimiento que motiva el diseño." },
 
-    { q: "3) ¿Qué es una especificación?",
-      opts: ["Conjunto de requisitos que debe cumplir el diseño.",
-             "Una limitación que reduce opciones.",
-             "Un factor obtenido luego del diseño final.",
-             "Una falla por carga aplicada una sola vez."],
-      a: 0, exp: "La especificación es el conjunto de requisitos que el diseño debe satisfacer." },
+    { q:"3) Una 'especificación' es:",
+      opts:[
+        "La restricción que limita el número de alternativas.",
+        "Una recomendación opcional del fabricante del material.",
+        "El conjunto de requisitos que debe cumplir el diseño.",
+        "El margen entre resistencia y esfuerzo aplicado."
+      ],
+      a:2, exp:"Especificación = requisitos que el diseño debe cumplir." },
 
-    { q: "4) ¿Qué es una restricción?",
-      opts: ["Limitación que reduce las opciones de diseño.",
-             "El máximo esfuerzo antes de fracturarse.",
-             "Una carga que genera esfuerzo cortante.",
-             "Una herramienta para hallar esfuerzos principales."],
-      a: 0, exp: "La restricción limita el espacio de soluciones (costo, espacio, proceso, material, etc.)." },
+    { q:"4) Una 'restricción' en el proceso de diseño es:",
+      opts:[
+        "El esfuerzo máximo para vida infinita.",
+        "Una limitación que reduce opciones (costo/espacio/proceso).",
+        "El criterio de falla para dúctiles.",
+        "La relación esfuerzo–deformación elástica."
+      ],
+      a:1, exp:"Restricción = limitación práctica o técnica que acota soluciones." },
 
-    { q: "5) ¿Qué es un código de diseño?",
-      opts: ["Conjunto de reglas técnicas para garantizar seguridad y funcionamiento.",
-             "Documento de marketing del producto.",
-             "Cálculo de velocidad crítica en ejes.",
-             "Curva esfuerzo–número de ciclos."],
-      a: 0, exp: "Un código de diseño reúne reglas técnicas para asegurar seguridad y funcionamiento." },
+    { q:"5) ¿Cuál describe mejor un 'código de diseño'?",
+      opts:[
+        "Guía técnica con reglas para asegurar seguridad y funcionamiento.",
+        "Catálogo comercial de componentes estándar.",
+        "Modelo matemático de fatiga (S–N).",
+        "Método gráfico para transformar esfuerzos."
+      ],
+      a:0, exp:"Código de diseño = reglas técnicas para garantizar seguridad y desempeño." },
 
-    { q: "6) ¿Qué es una norma técnica?",
-      opts: ["Especificación estandarizada para materiales, dimensiones o procesos.",
-             "Un criterio de falla para materiales dúctiles.",
-             "La oposición al estiramiento de un tornillo.",
-             "El esfuerzo máximo para vida infinita."],
-      a: 0, exp: "Una norma técnica estandariza requisitos: materiales, dimensiones, procesos, etc." },
+    { q:"6) La 'norma técnica' se usa para:",
+      opts:[
+        "Definir esfuerzos equivalentes por Von Mises.",
+        "Estimar velocidad crítica de un eje.",
+        "Estandarizar especificaciones (materiales/dimensiones/procesos).",
+        "Reemplazar ensayos experimentales."
+      ],
+      a:2, exp:"Norma técnica estandariza requisitos: materiales, dimensiones, procesos, etc." },
 
-    { q: "7) ¿Qué es el factor de diseño?",
-      opts: ["Relación entre resistencia y esfuerzo permisible.",
-             "Probabilidad de que un elemento funcione sin fallar.",
-             "Máxima carga sin deformación permanente.",
-             "Número de ciclos hasta la falla."],
-      a: 0, exp: "El factor de diseño compara resistencia vs esfuerzo permisible para diseñar con margen." },
+    { q:"7) Factor de diseño (n_d) es:",
+      opts:[
+        "Relación entre resistencia y esfuerzo permisible adoptado.",
+        "Relación entre esfuerzo alternante y esfuerzo medio.",
+        "Probabilidad de no fallar en servicio.",
+        "Máxima carga sin deformación permanente."
+      ],
+      a:0, exp:"El repaso define factor de diseño como relación resistencia / esfuerzo permisible." },
 
-    { q: "8) ¿Qué es el factor de seguridad?",
-      opts: ["Factor real obtenido después del diseño final.",
-             "Relación entre fuerza y deflexión.",
-             "Método gráfico para analizar esfuerzos.",
-             "Inestabilidad por compresión."],
-      a: 0, exp: "El factor de seguridad se interpreta como el margen real logrado tras dimensionar." },
+    { q:"8) Factor de seguridad (n) se entiende mejor como:",
+      opts:[
+        "Un valor impuesto antes de diseñar, sin relación con dimensiones finales.",
+        "El valor real resultante tras definir el diseño (margen logrado).",
+        "El esfuerzo donde inicia la deformación plástica.",
+        "La pendiente de la curva esfuerzo–deformación."
+      ],
+      a:1, exp:"Factor de seguridad = margen real obtenido con el diseño final." },
 
-    { q: "9) ¿Qué es confiabilidad?",
-      opts: ["Probabilidad de que un elemento funcione sin fallar.",
-             "Separación total del material.",
-             "Máximo esfuerzo sin deformación permanente.",
-             "Aumento local del esfuerzo por discontinuidades."],
-      a: 0, exp: "Confiabilidad = probabilidad de cumplir función sin falla en un periodo/condición." },
+    { q:"9) Confiabilidad es:",
+      opts:[
+        "Resistencia última dividida entre esfuerzo equivalente.",
+        "Probabilidad de que un elemento funcione sin fallar.",
+        "Capacidad de deformarse plásticamente antes de fallar.",
+        "Inestabilidad bajo compresión."
+      ],
+      a:1, exp:"Confiabilidad = probabilidad de cumplir función sin falla." },
 
-    { q: "10) ¿Qué es responsabilidad legal del producto?",
-      opts: ["Obligación del fabricante ante daños causados por fallas.",
-             "Medición del módulo de elasticidad.",
-             "Ensayo para obtener la curva S–N.",
-             "Velocidad donde ocurre resonancia."],
-      a: 0, exp: "Responsabilidad legal: obligación del fabricante por daños asociados a fallas del producto." },
+    { q:"10) Responsabilidad legal del producto se refiere a:",
+      opts:[
+        "Obligación del fabricante ante daños por fallas del producto.",
+        "Límite elástico establecido por norma ISO.",
+        "Costo asociado al mantenimiento.",
+        "Ensayo de carga para fatiga."
+      ],
+      a:0, exp:"Responsabilidad legal = obligación del fabricante por daños causados por fallas." },
 
-    { q: "11) ¿Qué es el módulo de elasticidad (E)?",
-      opts: ["Relación entre esfuerzo normal y deformación elástica.",
-             "Fin de la relación lineal esfuerzo–deformación.",
-             "Tendencia a fracturarse sin deformación plástica.",
-             "Máximo esfuerzo soportado antes de fracturarse."],
-      a: 0, exp: "E vincula esfuerzo normal con deformación elástica (zona lineal)." },
+    // 11–20 Materiales
+    { q:"11) Módulo de elasticidad (E) representa:",
+      opts:[
+        "Relación esfuerzo normal / deformación elástica (zona lineal).",
+        "Máximo esfuerzo sin deformación permanente.",
+        "Máximo esfuerzo antes de fractura.",
+        "Energía de distorsión para falla dúctil."
+      ],
+      a:0, exp:"E vincula esfuerzo normal con deformación elástica en régimen lineal." },
 
-    { q: "12) ¿Qué es el límite proporcional?",
-      opts: ["Fin de la relación lineal esfuerzo–deformación.",
-             "Inicio de deformación permanente.",
-             "Separación total del material.",
-             "Relación esfuerzo–número de ciclos."],
-      a: 0, exp: "El límite proporcional marca el fin de la linealidad (ley de Hooke estricta)." },
+    { q:"12) Límite proporcional es:",
+      opts:[
+        "Inicio de la deformación plástica.",
+        "Fin de la relación lineal esfuerzo–deformación.",
+        "Máximo esfuerzo antes de fractura.",
+        "Esfuerzo máximo para vida infinita."
+      ],
+      a:1, exp:"Marca el fin de la linealidad (ley de Hooke estricta)." },
 
-    { q: "13) ¿Qué es el límite elástico?",
-      opts: ["Máximo esfuerzo sin deformación permanente.",
-             "Esfuerzo donde inicia la deformación plástica.",
-             "Máximo esfuerzo antes de fracturarse.",
-             "Inestabilidad por compresión."],
-      a: 0, exp: "El límite elástico es el máximo esfuerzo sin dejar deformación permanente al descargar." },
+    { q:"13) Límite elástico se define mejor como:",
+      opts:[
+        "Esfuerzo donde inicia la deformación plástica (fluencia).",
+        "Máximo esfuerzo sin dejar deformación permanente al descargar.",
+        "Máximo esfuerzo alcanzable en ensayo de fatiga.",
+        "Esfuerzo normal máximo en un estado plano."
+      ],
+      a:1, exp:"Límite elástico = máximo esfuerzo sin deformación permanente." },
 
-    { q: "14) ¿Qué es la región plástica?",
-      opts: ["Región donde el material no recupera su forma original.",
-             "Región donde todo vuelve exactamente a la forma inicial.",
-             "Zona donde no existe esfuerzo cortante.",
-             "Zona donde solo hay esfuerzos principales."],
-      a: 0, exp: "En región plástica queda deformación permanente (no hay recuperación total)." },
+    { q:"14) Resistencia última (Sut) es:",
+      opts:[
+        "Máximo esfuerzo soportado antes de fracturarse.",
+        "Esfuerzo donde empieza la plasticidad.",
+        "Fin de la zona elástica lineal.",
+        "Esfuerzo equivalente de Von Mises."
+      ],
+      a:0, exp:"Sut = máximo esfuerzo que alcanza el material antes de fractura." },
 
-    { q: "15) ¿Qué es el esfuerzo de fluencia?",
-      opts: ["Esfuerzo donde inicia la deformación plástica.",
-             "Fin de la relación lineal esfuerzo–deformación.",
-             "Probabilidad de funcionar sin fallar.",
-             "Aumento local del esfuerzo por discontinuidades."],
-      a: 0, exp: "La fluencia inicia cuando el material entra a deformación plástica." },
+    { q:"15) Ductilidad es:",
+      opts:[
+        "Tendencia a fracturarse sin deformación plástica.",
+        "Capacidad de deformarse plásticamente antes de fallar.",
+        "Resistencia a la corrosión.",
+        "Capacidad de resistir cargas cíclicas indefinidamente."
+      ],
+      a:1, exp:"Ductilidad = deformación plástica significativa antes de ruptura." },
 
-    { q: "16) ¿Qué es la resistencia última?",
-      opts: ["Máximo esfuerzo soportado antes de fracturarse.",
-             "Máximo esfuerzo sin deformación permanente.",
-             "Esfuerzo máximo para vida infinita.",
-             "Oposición a la compresión."],
-      a: 0, exp: "Resistencia última: el máximo esfuerzo del material antes de fractura." },
+    { q:"16) Fragilidad es:",
+      opts:[
+        "Capacidad de deformarse plásticamente sin romper.",
+        "Tendencia a fracturarse con poca o nula deformación plástica.",
+        "Resistencia a esfuerzos cortantes.",
+        "Capacidad de recuperar deformación plástica."
+      ],
+      a:1, exp:"Frágil = rompe sin gran deformación plástica previa." },
 
-    { q: "17) ¿Qué es ductilidad?",
-      opts: ["Capacidad de deformarse plásticamente antes de fallar.",
-             "Tendencia a fracturarse sin deformación.",
-             "Método gráfico para esfuerzos.",
-             "Relación entre fuerza y deflexión."],
-      a: 0, exp: "Ductilidad: admite deformación plástica significativa antes de romper." },
+    { q:"17) En términos generales, el trabajo en frío:",
+      opts:[
+        "Aumenta resistencia y reduce ductilidad.",
+        "Reduce resistencia y aumenta ductilidad.",
+        "Elimina la concentración de esfuerzos.",
+        "Aumenta el módulo de elasticidad de forma significativa."
+      ],
+      a:0, exp:"Trabajo en frío endurece: sube resistencia y baja ductilidad." },
 
-    { q: "18) ¿Qué es fragilidad?",
-      opts: ["Tendencia a fracturarse sin deformación plástica.",
-             "Capacidad de deformarse plásticamente antes de fallar.",
-             "Carga que genera esfuerzo cortante.",
-             "Diseño con alto factor de seguridad."],
-      a: 0, exp: "Fragilidad: rompe con poca o nula deformación plástica previa." },
+    { q:"18) ¿Cuál afirmación es más correcta sobre E en aceros (idea de ejes)?",
+      opts:[
+        "E cambia mucho con el tipo de acero; por eso mejora deflexión comprando acero caro.",
+        "E es casi constante en aceros; para reducir deflexión suele servir más aumentar diámetro.",
+        "E solo importa en fatiga, no en deflexión.",
+        "E solo depende de la rugosidad superficial."
+      ],
+      a:1, exp:"En aceros, E es aproximadamente constante; la deflexión se mejora más con geometría." },
 
-    { q: "19) ¿Qué es trabajo en frío?",
-      opts: ["Deformación plástica por debajo de la recristalización.",
-             "Tratamiento térmico por encima de la recristalización.",
-             "Ensayo para medir velocidad crítica.",
-             "Método para sumar efectos de cargas."],
-      a: 0, exp: "Trabajo en frío: deformación plástica a temperaturas por debajo de recristalización." },
+    { q:"19) La fluencia se asocia principalmente con:",
+      opts:[
+        "Deformación permanente.",
+        "Deformación elástica recuperable.",
+        "Inestabilidad por compresión.",
+        "Fractura frágil inmediata."
+      ],
+      a:0, exp:"Fluencia implica inicio de deformación plástica permanente." },
 
-    { q: "20) ¿Qué efecto tiene el trabajo en frío?",
-      opts: ["Aumenta resistencia y reduce ductilidad.",
-             "Reduce resistencia y aumenta ductilidad.",
-             "Elimina el límite de fatiga.",
-             "Hace que no existan concentraciones de esfuerzo."],
-      a: 0, exp: "El trabajo en frío endurece: sube resistencia y baja ductilidad." },
+    { q:"20) En un diseño estático, una pieza dúctil se evalúa típicamente con:",
+      opts:[
+        "Esfuerzo normal máximo.",
+        "Energía de distorsión (Von Mises).",
+        "Círculo de Mohr como criterio de falla.",
+        "Curva S–N."
+      ],
+      a:1, exp:"En el repaso: Von Mises se usa para dúctiles." },
 
-    { q: "21) ¿Qué es esfuerzo normal?",
-      opts: ["Esfuerzo perpendicular al área.",
-             "Esfuerzo paralelo al área.",
-             "Esfuerzo que aparece solo en torsión.",
-             "Esfuerzo solo en cargas cíclicas."],
-      a: 0, exp: "Normal: actúa perpendicular a la sección (tracción/compresión/flexión)." },
+    // 21–30 Análisis de esfuerzos
+    { q:"21) Esfuerzo normal es:",
+      opts:[
+        "Paralelo al área.",
+        "Perpendicular al área.",
+        "Siempre máximo en torsión.",
+        "Exclusivo de carga cíclica."
+      ],
+      a:1, exp:"Normal: perpendicular al área de la sección." },
 
-    { q: "22) ¿Qué es esfuerzo cortante?",
-      opts: ["Esfuerzo paralelo al área.",
-             "Esfuerzo perpendicular al área.",
-             "Máximo esfuerzo sin deformación permanente.",
-             "Separación total del material."],
-      a: 0, exp: "Cortante: actúa paralelo a la sección (ej. torsión, corte directo)." },
+    { q:"22) Esfuerzo cortante es:",
+      opts:[
+        "Perpendicular al área.",
+        "Paralelo al área.",
+        "Siempre nulo en torsión.",
+        "Igual a Sut/2 en cualquier material."
+      ],
+      a:1, exp:"Cortante: actúa paralelo al plano de la sección." },
 
-    { q: "23) ¿Qué es esfuerzo axial?",
-      opts: ["Esfuerzo normal debido a tracción o compresión.",
-             "Esfuerzo cortante debido a torsión.",
-             "Aumento local de esfuerzo por ranuras.",
-             "Método para hallar esfuerzos principales."],
-      a: 0, exp: "Axial: esfuerzo normal provocado por fuerza de tracción/compresión en el eje del elemento." },
+    { q:"23) La flexión se caracteriza porque:",
+      opts:[
+        "Genera esfuerzo normal que varía en la sección.",
+        "Genera solo esfuerzo cortante uniforme.",
+        "No depende de la geometría.",
+        "Solo aparece en tornillos."
+      ],
+      a:0, exp:"Flexión induce esfuerzos normales variables a través de la sección." },
 
-    { q: "24) ¿Qué es flexión?",
-      opts: ["Carga que genera esfuerzo normal variable.",
-             "Carga que genera esfuerzo cortante uniforme.",
-             "Carga que solo aparece en uniones atornilladas.",
-             "Falla por carga aplicada una sola vez."],
-      a: 0, exp: "Flexión: produce esfuerzos normales que varían a través de la sección." },
+    { q:"24) La torsión en un eje produce principalmente:",
+      opts:[
+        "Esfuerzo normal uniforme.",
+        "Esfuerzo cortante.",
+        "Solo esfuerzo principal máximo sin cortante.",
+        "Solo deflexión axial."
+      ],
+      a:1, exp:"Torsión produce esfuerzo cortante." },
 
-    { q: "25) ¿Qué es torsión?",
-      opts: ["Carga que genera esfuerzo cortante.",
-             "Carga que genera solo esfuerzo normal.",
-             "Método energético para deflexiones.",
-             "Inestabilidad por compresión."],
-      a: 0, exp: "Torsión: momento torsor que induce esfuerzos cortantes (típico en ejes)." },
+    { q:"25) Esfuerzos principales son:",
+      opts:[
+        "Los esfuerzos normales máximos/mínimos en planos con cortante cero.",
+        "Los cortantes máximos con normal cero.",
+        "Los esfuerzos equivalentes de fatiga.",
+        "Los esfuerzos que aparecen solo en ejes."
+      ],
+      a:0, exp:"Principales: normales extremos en planos sin cortante." },
 
-    { q: "26) ¿Qué es un esfuerzo principal?",
-      opts: ["Esfuerzo normal máximo o mínimo sin cortante.",
-             "Esfuerzo cortante máximo con normal cero.",
-             "Esfuerzo equivalente para fatiga.",
-             "Esfuerzo máximo para vida infinita."],
-      a: 0, exp: "Principal: esfuerzos normales extremos en planos donde el cortante es cero." },
+    { q:"26) El círculo de Mohr sirve para:",
+      opts:[
+        "Determinar esfuerzos principales y cortante máximo en un punto.",
+        "Determinar la vida a fatiga directamente.",
+        "Eliminar concentraciones geométricas.",
+        "Calcular el módulo de elasticidad."
+      ],
+      a:0, exp:"Herramienta gráfica de transformación de esfuerzos." },
 
-    { q: "27) ¿Qué es el círculo de Mohr?",
-      opts: ["Método gráfico para analizar estados de esfuerzo.",
-             "Ensayo para hallar resistencia última.",
-             "Método para calcular velocidad crítica.",
-             "Norma para tornillos."],
-      a: 0, exp: "El círculo de Mohr es una herramienta gráfica para transformar esfuerzos y hallar principales/cortantes." },
+    { q:"27) Concentración de esfuerzos significa:",
+      opts:[
+        "Aumento local del esfuerzo por discontinuidades geométricas.",
+        "Aumento del módulo de elasticidad por tratamiento térmico.",
+        "Aumento de resistencia última por trabajo en frío.",
+        "Reducción del esfuerzo nominal en la sección."
+      ],
+      a:0, exp:"Concentración: picos locales por geometría (agujeros, ranuras, escalones)." },
 
-    { q: "28) ¿Para qué sirve el círculo de Mohr?",
-      opts: ["Encontrar esfuerzos principales y cortantes máximos.",
-             "Eliminar concentraciones de esfuerzo.",
-             "Determinar corrosión del material.",
-             "Calcular el límite proporcional."],
-      a: 0, exp: "Sirve para obtener esfuerzos principales y cortante máximo en un punto." },
+    { q:"28) ¿Qué enunciado es más correcto?",
+      opts:[
+        "Una entalla siempre aumenta el esfuerzo nominal, no el local.",
+        "Una entalla aumenta el esfuerzo local; el nominal puede no cambiar.",
+        "Una entalla elimina la posibilidad de fatiga.",
+        "Una entalla solo afecta materiales frágiles."
+      ],
+      a:1, exp:"La entalla eleva el esfuerzo local; el nominal es promedio/teórico." },
 
-    { q: "29) ¿Qué es concentración de esfuerzos?",
-      opts: ["Aumento local del esfuerzo por discontinuidades.",
-             "Disminución local del esfuerzo por uniformidad.",
-             "Falla por cargas cíclicas.",
-             "Relación entre fuerza y deformación."],
-      a: 0, exp: "Discontinuidades geométricas elevan el esfuerzo local respecto al nominal." },
+    { q:"29) Esfuerzo equivalente (en estática) se usa para:",
+      opts:[
+        "Comparar un estado complejo de esfuerzos con una resistencia del material.",
+        "Calcular la rugosidad superficial.",
+        "Reemplazar el círculo de Mohr en todas las situaciones.",
+        "Determinar la corrosión."
+      ],
+      a:0, exp:"El equivalente resume el estado de esfuerzos para comparar con resistencia (ej. Von Mises)." },
 
-    { q: "30) ¿Dónde suelen aparecer concentraciones?",
-      opts: ["Orificios, ranuras, cambios bruscos de sección.",
-             "Solo en materiales plásticos.",
-             "Solo en columnas esbeltas.",
-             "Solo en curvas S–N."],
-      a: 0, exp: "Aparecen en geometrías con cambios abruptos: agujeros, ranuras, escalones, etc." },
+    { q:"30) Para materiales frágiles, el repaso sugiere evaluar con:",
+      opts:[
+        "Esfuerzo normal máximo.",
+        "Von Mises siempre.",
+        "Superposición.",
+        "Castigliano."
+      ],
+      a:0, exp:"En el repaso: frágiles → esfuerzo normal máximo." },
 
-    { q: "31) ¿Qué es deflexión?",
-      opts: ["Deformación producida por una carga.",
-             "Separación total del material.",
-             "Probabilidad de no fallar.",
-             "Carga que genera esfuerzo cortante."],
-      a: 0, exp: "Deflexión: desplazamiento/deformación del elemento por carga." },
+    // 31–40 Deflexión y rigidez
+    { q:"31) Deflexión es:",
+      opts:[
+        "Deformación producida por una carga.",
+        "Separación total del material.",
+        "Probabilidad de no fallar.",
+        "Esfuerzo máximo para vida infinita."
+      ],
+      a:0, exp:"Deflexión = deformación/desplazamiento por carga." },
 
-    { q: "32) ¿Qué es rigidez?",
-      opts: ["Resistencia a la deformación.",
-             "Tendencia a fracturarse sin deformación plástica.",
-             "Relación esfuerzo–número de ciclos.",
-             "Margen entre resistencia y esfuerzo."],
-      a: 0, exp: "Rigidez: qué tanto se opone el elemento a deformarse." },
+    { q:"32) Rigidez es:",
+      opts:[
+        "Resistencia a la deformación.",
+        "Tendencia a fracturarse sin deformación plástica.",
+        "Número de ciclos hasta la falla.",
+        "Máximo esfuerzo sin deformación permanente."
+      ],
+      a:0, exp:"Rigidez describe oposición a deformarse." },
 
-    { q: "33) ¿Qué ley relaciona fuerza y deformación?",
-      opts: ["Ley de Hooke.",
-             "Ley de Newton de gravitación.",
-             "Ley de Coulomb (electricidad).",
-             "Ley de Boyle (gases)."],
-      a: 0, exp: "La ley de Hooke relaciona fuerza (o esfuerzo) con deformación en régimen elástico lineal." },
+    { q:"33) Superposición en deflexiones aplica cuando:",
+      opts:[
+        "El comportamiento es lineal elástico.",
+        "Existe deformación plástica significativa.",
+        "Hay pandeo post-crítico.",
+        "La fatiga domina el diseño."
+      ],
+      a:0, exp:"Se usa en sistemas lineales: efectos de cargas se suman." },
 
-    { q: "34) ¿Qué es una constante de resorte?",
-      opts: ["Relación entre fuerza y deflexión.",
-             "Relación entre esfuerzo y número de ciclos.",
-             "Aumento local por discontinuidad.",
-             "Inestabilidad por compresión."],
-      a: 0, exp: "La constante k une fuerza con deflexión: F = k·δ (en comportamiento lineal)." },
+    { q:"34) Castigliano se usa principalmente para:",
+      opts:[
+        "Calcular deflexiones mediante energía de deformación.",
+        "Determinar resistencia última.",
+        "Obtener la curva S–N experimentalmente.",
+        "Determinar esfuerzo principal con un método gráfico."
+      ],
+      a:0, exp:"Castigliano: método energético para deflexiones." },
 
-    { q: "35) ¿Qué es superposición?",
-      opts: ["Método para sumar efectos de cargas.",
-             "Método para hallar esfuerzos principales.",
-             "Proceso de recristalización.",
-             "Tipo de fatiga de alto ciclaje."],
-      a: 0, exp: "Superposición: si el sistema es lineal, los efectos se suman." },
+    { q:"35) Controlar deflexión es importante porque:",
+      opts:[
+        "Una pieza puede no romper, pero fallar funcionalmente.",
+        "Siempre reduce la resistencia última del material.",
+        "Elimina la fatiga automáticamente.",
+        "Incrementa la confiabilidad sin cambiar geometría."
+      ],
+      a:0, exp:"Aunque no haya fractura, puede fallar funcionalmente (alineación, contacto, etc.)." },
 
-    { q: "36) ¿Qué es el teorema de Castigliano?",
-      opts: ["Método energético para calcular deflexiones.",
-             "Criterio de falla para materiales frágiles.",
-             "Norma internacional de estandarización.",
-             "Ensayo para vida a fatiga."],
-      a: 0, exp: "Castigliano: usa energía de deformación para obtener deflexiones." },
+    { q:"36) Pandeo es:",
+      opts:[
+        "Inestabilidad por compresión (lateral).",
+        "Fractura por tracción pura.",
+        "Deformación elástica recuperable.",
+        "Falla por cargas cíclicas."
+      ],
+      a:0, exp:"Pandeo: pérdida de estabilidad bajo compresión en elementos esbeltos." },
 
-    { q: "37) ¿Por qué se controla la deflexión?",
-      opts: ["Para evitar fallas funcionales.",
-             "Para aumentar la corrosión.",
-             "Para eliminar esfuerzos cortantes.",
-             "Para reducir la ductilidad."],
-      a: 0, exp: "Se controla porque aunque no rompa, puede fallar funcionalmente (alineación, contacto, etc.)." },
+    { q:"37) Un elemento típicamente susceptible al pandeo es:",
+      opts:[
+        "Columna esbelta.",
+        "Eje corto macizo a torsión pura.",
+        "Tornillo corto a tracción.",
+        "Placa gruesa a compresión uniforme."
+      ],
+      a:0, exp:"Columnas esbeltas son el caso típico de pandeo." },
 
-    { q: "38) ¿Qué elemento suele fallar por deflexión excesiva?",
-      opts: ["Ejes y engranes.",
-             "Solo tornillos.",
-             "Solo columnas.",
-             "Solo probetas de ensayo."],
-      a: 0, exp: "En ejes/engranes, la deflexión causa problemas de alineamiento y contacto." },
+    { q:"38) La ley que relaciona esfuerzo y deformación elástica es:",
+      opts:[
+        "Hooke.",
+        "Coulomb.",
+        "Bernoulli.",
+        "Pascal."
+      ],
+      a:0, exp:"Ley de Hooke: esfuerzo proporcional a deformación en elástico lineal." },
 
-    { q: "39) ¿Qué es pandeo?",
-      opts: ["Inestabilidad por compresión.",
-             "Separación total del material.",
-             "Relación entre fuerza y deflexión.",
-             "Falla por cargas cíclicas."],
-      a: 0, exp: "Pandeo: inestabilidad (flexión lateral súbita) bajo compresión." },
+    { q:"39) Una constante de resorte se interpreta como:",
+      opts:[
+        "Relación fuerza/deflexión (k).",
+        "Relación esfuerzo/ciclos (S–N).",
+        "Relación Sut/Sy.",
+        "Relación esfuerzo equivalente/resistencia."
+      ],
+      a:0, exp:"k vincula fuerza con deflexión en comportamiento lineal." },
 
-    { q: "40) ¿Qué tipo de elemento sufre pandeo?",
-      opts: ["Columnas esbeltas.",
-             "Engranes macizos en torsión.",
-             "Tornillos solo a tensión.",
-             "Barras solo a cortante."],
-      a: 0, exp: "Típico en columnas esbeltas: pequeñas imperfecciones disparan inestabilidad." },
+    { q:"40) En ejes, para reducir deflexión normalmente es más efectivo:",
+      opts:[
+        "Aumentar diámetro.",
+        "Comprar acero 'más resistente' esperando que E suba mucho.",
+        "Reducir el factor de seguridad.",
+        "Pulir superficie para aumentar E."
+      ],
+      a:0, exp:"E en aceros casi no cambia; la geometría (diámetro) influye fuerte en rigidez." },
 
-    { q: "41) ¿Qué es falla estática?",
-      opts: ["Falla por una carga aplicada una sola vez.",
-             "Falla por cargas cíclicas repetidas.",
-             "Falla por corrosión exclusivamente.",
-             "Falla por resonancia a alta velocidad."],
-      a: 0, exp: "Estática: se evalúa con cargas no repetitivas (una aplicación principal)." },
+    // 41–50 Falla estática
+    { q:"41) Falla estática se refiere a:",
+      opts:[
+        "Falla por carga aplicada una sola vez (o no cíclica).",
+        "Falla siempre por corrosión.",
+        "Falla por vibración a velocidad crítica.",
+        "Falla por cargas cíclicas."
+      ],
+      a:0, exp:"Estática: carga no repetitiva (comparado con fatiga)." },
 
-    { q: "42) ¿Qué es fluencia?",
-      opts: ["Inicio de deformación permanente.",
-             "Fin de la relación lineal esfuerzo–deformación.",
-             "Número de ciclos hasta la falla.",
-             "Máxima carga sin deformación permanente."],
-      a: 0, exp: "Fluencia: inicio de deformación plástica permanente." },
+    { q:"42) Sobrecarga ocurre cuando:",
+      opts:[
+        "El esfuerzo aplicado supera la resistencia.",
+        "El esfuerzo aplicado es menor que el límite elástico.",
+        "La rugosidad superficial reduce Se.",
+        "Se usa Von Mises en frágiles."
+      ],
+      a:0, exp:"Sobrecarga = esfuerzo excede resistencia ⇒ falla." },
 
-    { q: "43) ¿Qué es fractura?",
-      opts: ["Separación total del material.",
-             "Deformación elástica recuperable.",
-             "Suma de efectos de cargas.",
-             "Resonancia en un eje."],
-      a: 0, exp: "Fractura: separación completa (rotura) del material." },
+    { q:"43) En dúctiles, la 'falla' estática más típica antes de fractura es:",
+      opts:[
+        "Fluencia (deformación permanente).",
+        "Pandeo siempre.",
+        "Corrosión acelerada.",
+        "Vida finita por fatiga."
+      ],
+      a:0, exp:"En dúctiles, suele gobernar la fluencia antes de fractura final." },
 
-    { q: "44) ¿Qué es criterio de falla?",
-      opts: ["Método para predecir falla.",
-             "Norma para tornillos.",
-             "Relación entre esfuerzo y deformación elástica.",
-             "Proceso para crear componentes."],
-      a: 0, exp: "Es una regla/teoría que decide si falla comparando esfuerzos con resistencias." },
+    { q:"44) Un criterio de falla es:",
+      opts:[
+        "Regla/método para decidir falla comparando esfuerzos y resistencias.",
+        "Una medida de rugosidad superficial.",
+        "Un tipo de tornillo de alta resistencia.",
+        "Un sinónimo de norma técnica."
+      ],
+      a:0, exp:"Criterio de falla: teoría para predecir falla en estados de esfuerzo." },
 
-    { q: "45) ¿Qué criterio se usa en materiales dúctiles?",
-      opts: ["Energía de distorsión (Von Mises).",
-             "Esfuerzo normal máximo.",
-             "Círculo de Mohr.",
-             "Ley de Hooke."],
-      a: 0, exp: "Para dúctiles se usa Von Mises (energía de distorsión) en el repaso." },
+    { q:"45) Von Mises se asocia con:",
+      opts:[
+        "Materiales dúctiles y energía de distorsión.",
+        "Materiales frágiles y esfuerzo normal máximo.",
+        "Deflexión por energía total.",
+        "Curvas S–N de fatiga."
+      ],
+      a:0, exp:"Von Mises (energía de distorsión) es criterio típico para dúctiles." },
 
-    { q: "46) ¿Qué criterio se usa en materiales frágiles?",
-      opts: ["Esfuerzo normal máximo.",
-             "Energía de distorsión (Von Mises).",
-             "Superposición.",
-             "Constante de resorte."],
-      a: 0, exp: "Para frágiles se aplica esfuerzo normal máximo según el repaso." },
+    { q:"46) Esfuerzo normal máximo se asocia con:",
+      opts:[
+        "Materiales frágiles.",
+        "Materiales dúctiles.",
+        "Método de Castigliano.",
+        "Ecuación de Paris."
+      ],
+      a:0, exp:"En el repaso: frágiles → esfuerzo normal máximo." },
 
-    { q: "47) ¿Qué es esfuerzo equivalente?",
-      opts: ["Esfuerzo que se compara con la resistencia.",
-             "Esfuerzo paralelo al área.",
-             "Esfuerzo máximo para vida infinita.",
-             "Inestabilidad por compresión."],
-      a: 0, exp: "Se calcula un esfuerzo “equivalente” para compararlo con la resistencia del material." },
+    { q:"47) Esfuerzo equivalente es útil porque:",
+      opts:[
+        "Permite comparar un estado multiaxial con una resistencia uniaxial.",
+        "Elimina concentraciones de esfuerzos.",
+        "Evita la necesidad de conocer geometría.",
+        "Es igual a Sy para cualquier estado."
+      ],
+      a:0, exp:"Resume el estado para compararlo contra resistencia (ej. Von Mises)." },
 
-    { q: "48) ¿Qué es falla por sobrecarga?",
-      opts: ["Falla cuando el esfuerzo supera la resistencia.",
-             "Falla por cargas cíclicas.",
-             "Falla por corrosión que elimina el límite de fatiga.",
-             "Falla por pandeo de columnas."],
-      a: 0, exp: "Sobrecarga: el esfuerzo aplicado excede la resistencia del material." },
+    { q:"48) En el diseño estático, el factor de seguridad se interpreta como:",
+      opts:[
+        "Margen entre resistencia y esfuerzo aplicado.",
+        "Número de ciclos hasta falla.",
+        "Relación fuerza-deflexión.",
+        "Relación entre rugosidad y corrosión."
+      ],
+      a:0, exp:"En estática: margen para reducir riesgo frente a incertidumbre." },
 
-    { q: "49) ¿Qué es factor de seguridad en falla estática?",
-      opts: ["Margen entre resistencia y esfuerzo.",
-             "Relación entre fuerza y deflexión.",
-             "Número de ciclos hasta la falla.",
-             "Método para hallar esfuerzos principales."],
-      a: 0, exp: "En estática, es el margen que separa la resistencia del esfuerzo actuante." },
+    { q:"49) Un diseño conservador implica usualmente:",
+      opts:[
+        "Mayor factor de seguridad.",
+        "Menor factor de seguridad.",
+        "Ignorar concentraciones de esfuerzo.",
+        "Diseñar solo con fatiga."
+      ],
+      a:0, exp:"Conservador = más margen (más n) para reducir probabilidad de falla." },
 
-    { q: "50) ¿Qué es un diseño conservador?",
-      opts: ["Diseño con alto factor de seguridad.",
-             "Diseño con el menor diámetro posible siempre.",
-             "Diseño solo para cargas cíclicas.",
-             "Diseño que ignora concentraciones de esfuerzo."],
-      a: 0, exp: "Conservador: usa un factor de seguridad alto para reducir riesgo." },
+    { q:"50) La fractura se define como:",
+      opts:[
+        "Separación total del material.",
+        "Inicio de deformación plástica.",
+        "Fin de la linealidad esfuerzo-deformación.",
+        "Esfuerzo máximo para vida infinita."
+      ],
+      a:0, exp:"Fractura = ruptura/separación completa del material." },
 
-    { q: "51) ¿Qué es la fatiga?",
-      opts: ["Falla por cargas cíclicas.",
-             "Falla por una sola carga aplicada.",
-             "Inestabilidad por compresión.",
-             "Aumento local del esfuerzo por discontinuidades."],
-      a: 0, exp: "Fatiga: falla asociada a esfuerzos repetidos/cíclicos." },
+    // 51–60 Fatiga + ejes + tornillos (repaso)
+    { q:"51) Fatiga es:",
+      opts:[
+        "Falla por cargas cíclicas/repetidas.",
+        "Falla por una sola carga aplicada.",
+        "Solo corrosión en la superficie.",
+        "Inestabilidad por compresión."
+      ],
+      a:0, exp:"Fatiga: falla por cargas cíclicas." },
 
-    { q: "52) ¿Puede ocurrir bajo el límite elástico?",
-      opts: ["Sí.",
-             "No, nunca.",
-             "Solo si hay pandeo.",
-             "Solo si el material es frágil."],
-      a: 0, exp: "Según el repaso, la fatiga puede ocurrir incluso bajo el límite elástico." },
+    { q:"52) Según el repaso, la fatiga puede ocurrir:",
+      opts:[
+        "Solo por encima del límite elástico.",
+        "Incluso por debajo del límite elástico.",
+        "Solo si hay pandeo.",
+        "Solo si el material es frágil."
+      ],
+      a:1, exp:"El repaso indica que puede ocurrir bajo el límite elástico." },
 
-    { q: "53) ¿Qué es la curva S–N?",
-      opts: ["Relación esfuerzo–número de ciclos.",
-             "Relación fuerza–deflexión.",
-             "Relación esfuerzo–deformación elástica.",
-             "Relación torque–diámetro."],
-      a: 0, exp: "S–N vincula amplitud de esfuerzo con cantidad de ciclos hasta falla." },
+    { q:"53) Curva S–N representa:",
+      opts:[
+        "Relación esfuerzo–número de ciclos.",
+        "Relación fuerza–deflexión.",
+        "Relación esfuerzo–deformación elástica.",
+        "Relación torque–ángulo de giro."
+      ],
+      a:0, exp:"S–N: esfuerzo alternante vs ciclos a falla." },
 
-    { q: "54) ¿Qué es vida a fatiga?",
-      opts: ["Número de ciclos hasta la falla.",
-             "Máximo esfuerzo sin deformación permanente.",
-             "Separación total del material.",
-             "Oposición al estiramiento."],
-      a: 0, exp: "Vida a fatiga: cuántos ciclos soporta antes de fallar." },
+    { q:"54) Vida a fatiga es:",
+      opts:[
+        "Número de ciclos hasta la falla.",
+        "Máximo esfuerzo sin deformación permanente.",
+        "Probabilidad de no fallar.",
+        "Energía de distorsión crítica."
+      ],
+      a:0, exp:"Vida: ciclos hasta falla." },
 
-    { q: "55) ¿Qué es el límite de resistencia a la fatiga?",
-      opts: ["Esfuerzo máximo para vida infinita.",
-             "Esfuerzo donde inicia la deformación plástica.",
-             "Fin de la relación lineal esfuerzo–deformación.",
-             "Criterio de falla para materiales dúctiles."],
-      a: 0, exp: "Límite de fatiga: esfuerzo umbral asociado a vida “infinita” (idealmente)." },
+    { q:"55) Límite de resistencia a la fatiga es:",
+      opts:[
+        "Esfuerzo máximo para vida infinita.",
+        "Esfuerzo donde inicia la plasticidad.",
+        "Máximo esfuerzo antes de fractura.",
+        "Fin de la zona lineal."
+      ],
+      a:0, exp:"En el repaso: límite de fatiga = esfuerzo máximo para vida infinita." },
 
-    { q: "56) ¿Dónde inicia una grieta por fatiga?",
-      opts: ["En concentraciones de esfuerzo.",
-             "Siempre en el centro geométrico.",
-             "Solo donde hay compresión pura.",
-             "En zonas sin discontinuidades."],
-      a: 0, exp: "La iniciación ocurre típicamente en zonas de concentración de esfuerzo." },
+    { q:"56) Una grieta por fatiga inicia típicamente en:",
+      opts:[
+        "Concentraciones de esfuerzo.",
+        "Cualquier punto, siempre al azar.",
+        "Solo en el centro geométrico.",
+        "Zonas con compresión pura y sin entallas."
+      ],
+      a:0, exp:"Se inicia en concentradores por los picos locales de esfuerzo." },
 
-    { q: "57) ¿Qué es fatiga de alto ciclaje?",
-      opts: ["Más de 10³ ciclos.",
-             "Menos de 10³ ciclos.",
-             "Más de 10⁶ ciclos exclusivamente.",
-             "Un tipo de pandeo por compresión."],
-      a: 0, exp: "En el repaso: alto ciclaje > 10³ ciclos." },
+    { q:"57) Alto ciclaje (según repaso) corresponde a:",
+      opts:[
+        "N > 10^3 ciclos.",
+        "N < 10^3 ciclos.",
+        "N < 10^2 ciclos.",
+        "N > 10^9 ciclos exclusivamente."
+      ],
+      a:0, exp:"Repaso: alto ciclaje > 10^3." },
 
-    { q: "58) ¿Qué es fatiga de bajo ciclaje?",
-      opts: ["Menos de 10³ ciclos.",
-             "Más de 10³ ciclos.",
-             "Solo si hay corrosión.",
-             "Solo en tornillos."],
-      a: 0, exp: "En el repaso: bajo ciclaje < 10³ ciclos." },
+    { q:"58) Bajo ciclaje (según repaso) corresponde a:",
+      opts:[
+        "N < 10^3 ciclos.",
+        "N > 10^3 ciclos.",
+        "N = 10^6 ciclos.",
+        "N = 1 ciclo."
+      ],
+      a:0, exp:"Repaso: bajo ciclaje < 10^3." },
 
-    { q: "59) ¿Qué efecto tiene la rugosidad superficial?",
-      opts: ["Reduce la resistencia a la fatiga.",
-             "Aumenta la resistencia a la fatiga.",
-             "Elimina el límite proporcional.",
-             "Evita concentraciones de esfuerzo."],
-      a: 0, exp: "La rugosidad genera micro-entallas → reduce resistencia a fatiga." },
+    { q:"59) En ejes, el repaso indica que el criterio usado para diseño es:",
+      opts:[
+        "Von Mises.",
+        "Esfuerzo normal máximo.",
+        "Castigliano.",
+        "Círculo de Mohr."
+      ],
+      a:0, exp:"En el repaso: ejes se diseñan con Von Mises." },
 
-    { q: "60) ¿Qué efecto tiene la corrosión?",
-      opts: ["Elimina el límite de fatiga.",
-             "Aumenta el límite de fatiga.",
-             "Convierte el material en dúctil.",
-             "Evita el pandeo."],
-      a: 0, exp: "La corrosión acelera daño; según el repaso, elimina el límite de fatiga." },
+    { q:"60) En uniones atornilladas, 'precarga' es:",
+      opts:[
+        "Fuerza inicial generada al apretar el tornillo.",
+        "Fuerza externa máxima antes de fluencia.",
+        "Fuerza que aparece solo en fatiga.",
+        "Fuerza que elimina el pandeo."
+      ],
+      a:0, exp:"Precarga: fuerza inicial por apriete que mantiene unidas las piezas." },
   ];
 
   const quizEl = document.getElementById("quiz");
@@ -475,8 +602,6 @@
     questions.forEach((item, idx) => {
       const box = document.createElement("div");
       box.className = "q";
-      const n = idx + 1;
-
       const title = document.createElement("h3");
       title.textContent = item.q;
       box.appendChild(title);
@@ -496,7 +621,7 @@
 
         label.htmlFor = id;
         label.appendChild(input);
-        label.appendChild(document.createTextNode(" " + ["A) ", "B) ", "C) ", "D) "][j] + opt));
+        label.appendChild(document.createTextNode(" " + ["A) ","B) ","C) ","D) "][j] + opt));
 
         opts.appendChild(label);
       });
@@ -513,6 +638,15 @@
     return chosen ? parseInt(chosen.value, 10) : null;
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function grade() {
     let score = 0;
     const corrections = [];
@@ -521,7 +655,6 @@
       const ans = getUserAnswer(idx);
       const correct = item.a;
       const isCorrect = ans === correct;
-
       if (isCorrect) score += 1;
 
       corrections.push({
@@ -537,8 +670,6 @@
     });
 
     const pct = Math.round((score / questions.length) * 100);
-
-    // Render results
     const wrongs = corrections.filter(x => !x.isCorrect).length;
 
     let html = `
@@ -546,18 +677,18 @@
       <p><strong>Puntaje:</strong> ${score} / ${questions.length} <span class="pill">${pct}%</span></p>
       <p><strong>Incorrectas:</strong> ${wrongs} | <strong>Correctas:</strong> ${score}</p>
       <h2>Correcciones</h2>
-      <p class="muted">Abajo verás por pregunta: tu alternativa, la correcta y una explicación breve.</p>
+      <p class="muted">Para cada pregunta: tu alternativa, la correcta y la explicación.</p>
     `;
 
     corrections.forEach(c => {
       const status = c.isCorrect ? "<span class='ok'>✔ Correcta</span>" : "<span class='bad'>✘ Incorrecta</span>";
-      const chosenLabel = c.chosen === null ? "—" : ["A", "B", "C", "D"][c.chosen];
-      const correctLabel = ["A", "B", "C", "D"][c.correct];
+      const chosenLabel = c.chosen === null ? "—" : ["A","B","C","D"][c.chosen];
+      const correctLabel = ["A","B","C","D"][c.correct];
 
       html += `
         <div class="corr-item">
           <div><strong>${c.num}.</strong> ${status}</div>
-          <div class="muted"><em>${c.question}</em></div>
+          <div class="muted"><em>${escapeHtml(c.question)}</em></div>
           <div><strong>Tu respuesta:</strong> ${chosenLabel}) ${escapeHtml(c.chosenText)}</div>
           <div><strong>Correcta:</strong> ${correctLabel}) ${escapeHtml(c.correctText)}</div>
           <div><strong>Explicación:</strong> ${escapeHtml(c.exp)}</div>
@@ -566,8 +697,7 @@
     });
 
     resultEl.innerHTML = html;
-    // Scroll to result
-    resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    resultEl.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 
   function resetAll() {
@@ -575,16 +705,6 @@
     inputs.forEach(i => i.checked = false);
     resultEl.innerHTML = "<span class='muted'>Reiniciado. Vuelve a responder y calcula tu puntaje.</span>";
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  // Simple HTML escape for safe rendering
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
   }
 
   gradeBtn.addEventListener("click", grade);
